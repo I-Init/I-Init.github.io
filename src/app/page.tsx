@@ -9,6 +9,7 @@ import '@/lib/env';
 
 import { covarianceTable, initializationTable, networkOnlyTable, odometryTable } from '@/data/results';
 
+import AlignmentDemo from '@/components/demos/AlignmentDemo';
 import Figure from '@/components/Figure';
 import KatexSpan from '@/components/KaTeX';
 import ArrowLink from '@/components/links/ArrowLink';
@@ -57,23 +58,21 @@ function FindingBlock({
 }) {
   return (
     <article className='border-t border-gray-200 py-12'>
-      <div className='grid items-center gap-8 lg:grid-cols-[2fr_3fr] lg:gap-12'>
-        <div>
-          <h2 className='pb-4 text-gray-800'>
-            <span className='text-primary-600'>Finding {idx}:</span> {title}
-          </h2>
-          <p className='pb-3 text-lg'>{setup}</p>
-          <ul className='list-disc space-y-2 pb-4 pl-6 text-lg'>
-            {results.map((result, i) => (
-              <li key={i}>{result}</li>
-            ))}
-          </ul>
-          <p className='rounded-r-lg border-l-4 border-primary-500 bg-primary-50 px-4 py-3 text-sm leading-relaxed'>
-            <strong className='text-primary-700'>Note:</strong> {note}
-          </p>
-        </div>
-        <div className='min-w-0'>{children}</div>
+      <h2 className='pb-4 text-gray-800'>
+        <span className='text-primary-600'>Finding {idx}:</span> {title}
+      </h2>
+      <div>
+        <p className='pb-3 text-lg'>{setup}</p>
+        <ul className='list-disc space-y-2 pb-4 pl-6 text-lg'>
+          {results.map((result, i) => (
+            <li key={i}>{result}</li>
+          ))}
+        </ul>
+        <p className='rounded-r-lg border-l-4 border-primary-500 bg-primary-50 px-4 py-3 text-base leading-relaxed'>
+          <strong className='text-primary-700'>Note:</strong> {note}
+        </p>
       </div>
+      <div className='min-w-0 pt-8'>{children}</div>
       {below && <div className='pt-8'>{below}</div>}
     </article>
   );
@@ -83,8 +82,8 @@ function FindingBlock({
 function Equation({ tex, number }: { tex: string; number: number }) {
   return (
     <div className='flex items-center gap-2 text-gray-800'>
-      <KatexSpan tex={tex} display className='min-w-0 flex-1 text-xs sm:text-base' />
-      <span className='shrink-0 text-sm'>({number})</span>
+      <KatexSpan tex={tex} display className='min-w-0 flex-1 text-xs sm:text-base lg:text-lg' />
+      <span className='shrink-0 text-sm md:text-base'>({number})</span>
     </div>
   );
 }
@@ -164,50 +163,66 @@ export default function HomePage() {
       <section className={clsx(bgColor, textColor)}>
         <div className='layout py-12'>
           <h2 className='text-left pb-4'>Abstract</h2>
-          <p className='max-w-[58rem] text-pretty text-base leading-[1.75] md:text-lg md:leading-[1.75]'>
+          <p className='text-pretty text-base leading-[1.75] md:text-lg md:leading-[1.75]'>
             State initialization is essential for robotic navigation and simultaneous localization and mapping (SLAM).
             Conventional initialization methods fuse inertial measurements with exteroceptive sensors, such as cameras and LiDAR.
             However, these sensors can become unreliable under aggressive motion or poor geometric conditions.
             Inertial odometry (IO) estimates motion using only inertial measurement units (IMUs), eliminating dependence on exteroceptive sensors.
             However, existing learning-based IO methods typically assume access to ground-truth initial states, leaving the initialization problem largely unexplored.
             This assumption limits their applicability to real-world deployment.
-            To bridge this gap, we present <b>I-Init</b>, an IMU-only initialization method that estimates the initial velocity, gravity direction, and gyroscope bias for learning-based inertial odometry.
-            I-Init leverages a unified Transformer-based <b>Motion Network</b> for both initialization and odometry.
+            To bridge this gap, we present I-Init, an IMU-only initialization method that estimates the initial velocity, gravity direction, and gyroscope bias for learning-based inertial odometry.
+            I-Init leverages a unified Transformer-based Motion Network for both initialization and odometry.
             The network predictions provide constraints for initial state estimation without exteroceptive sensors.
             On EuRoC, I-Init achieves comparable gravity-direction estimation accuracy to the visual-inertial VINS-Mono initializer, with a 95% initialization success rate compared to 51% for VINS-Mono.
             Experiments on EuRoC, Blackbird, and TLIO demonstrate state-of-the-art inertial odometry performance.
             We demonstrate that odometry initialized with our IMU-only initialization is very close to the ground-truth initialization.
           </p>
           <div className='mt-8'>
-            <h3 className='mb-4 text-left text-2xl font-semibold'>
-              Initialization Without Exteroceptive Sensors
-            </h3>
             <Figure
               img_src='/images/fig1_overview.png'
               alt='Top: four EuRoC V1_03 frames under aggressive rotation, with success rates of 51% for VINS-Mono and 95% for I-Init. Bottom: conventional initialization from IMU preintegration, camera, and LiDAR, compared with I-Init from IMU preintegration and a unified network.'
               title='IMU-only initialization'
               width={2732}
               height={1179}
-              caption='The conventional method estimates the initial state through multi-sensor fusion. In contrast, I-Init initializes the gravity direction, initial velocity, and gyroscope bias using only IMU measurements and learned velocity predictions without exteroceptive sensing. On the EuRoC dataset, I-Init achieves a 95% initialization success rate, compared with only 51% for the visual-inertial VINS-Mono baseline.'
+              caption='Conventional methods fuse the IMU with cameras or LiDAR. I-Init needs only IMU measurements and learned velocity.'
               idx={1}
             />
           </div>
         </div>
       </section>
 
+      <section id='video' aria-labelledby='video-title' className={clsx(bgColor, textColor)}>
+        <div className='layout border-t border-gray-200 py-12'>
+          <h2 id='video-title' className='pb-4'>Video</h2>
+          <video
+            controls
+            playsInline
+            preload='metadata'
+            poster='/videos/i-init-explainer-poster.jpg'
+            width={2560}
+            height={1440}
+            aria-label='I-Init explainer video'
+            className='block h-auto w-full rounded-xl border border-gray-200 bg-black shadow-sm'
+          >
+            <source src='/videos/i-init-explainer.mp4' type='video/mp4' />
+            Your browser cannot play this video. <a href='/videos/i-init-explainer.mp4'>Download it (MP4, 19 MB)</a>.
+          </video>
+        </div>
+      </section>
+
       <section id='methods' aria-labelledby='methods-title' className={clsx(secondaryBgColor, textColor)}>
         <div className='layout py-12'>
           <h2 id='methods-title' className='pb-4'>Methods</h2>
-          <p className='text-lg'>I-Init estimates motion from IMU measurements alone with three components:</p>
-          <ol className='max-w-[58rem] text-lg list-decimal ml-12 pb-6'>
+          <p className='text-lg'>I-Init has three components:</p>
+          <ol className='text-lg list-decimal ml-12 pb-6'>
             <li className='pt-2'>
-              <span className={hlTextColor}>Motion Network.</span> A Transformer predicts body-frame velocity, roll &amp; pitch, and their uncertainties from a window of raw IMU samples. It takes no attitude or other state estimate as input, so it operates from the first IMU window onward.
+              <span className={hlTextColor}>Motion Network.</span> Predicts body-frame velocity, roll &amp; pitch, and their uncertainties from raw IMU. It needs no attitude input, so it works from the first window.
             </li>
             <li className='pt-2'>
-              <span className={hlTextColor}>IMU-only initializer.</span> Aligning the network&apos;s predictions with IMU preintegration estimates the gravity direction, initial velocity, and gyroscope bias, <KatexSpan tex={EQUATIONS.states} />.
+              <span className={hlTextColor}>IMU-only initializer.</span> Aligns these predictions with IMU preintegration to estimate <KatexSpan tex={EQUATIONS.states} />.
             </li>
             <li className='pt-2'>
-              <span className={hlTextColor}>Uncertainty-aware EKF.</span> The estimated state initializes an EKF that fuses IMU propagation with velocity predictions from the same network, weighted by their predicted covariance.
+              <span className={hlTextColor}>Uncertainty-aware EKF.</span> Fuses IMU propagation with the network&apos;s velocity, weighted by the predicted covariance.
             </li>
           </ol>
           <Figure
@@ -216,51 +231,57 @@ export default function HomePage() {
             title='Overview of I-Init and the Motion Network architecture'
             width={2698}
             height={748}
-            caption={<><b>(a)</b> The initializer and the EKF share the Motion Network&apos;s predictions; AirIMU correction is optional. <b>(b)</b> The Motion Network maps an IMU window to body-frame velocity, roll &amp; pitch, and their uncertainties.</>}
+            caption={<><b>(a)</b> The initializer and the EKF share the Motion Network&apos;s predictions; AirIMU is optional. <b>(b)</b> Motion Network.</>}
             idx={2}
           />
           <div className='grid gap-6 pt-8 lg:grid-cols-2'>
             <article className='min-w-0 rounded-2xl bg-white p-4 shadow-sm md:p-6'>
               <h3 className='pb-2 text-gray-800'>Velocity alignment</h3>
               <p>
-                An IMU alone cannot determine the initial velocity or the gravity direction, because integration propagates both from unknown initial values.
-                The network supplies the missing reference: each velocity prediction is computed from a window of measurements rather than accumulated by integration, so its error does not grow with time.
-                At each key-frame, the predicted velocity rotated into the first body frame should equal the preintegrated velocity:
+                The IMU alone cannot recover initial velocity or gravity. The network&apos;s velocity does not drift, so it supplies the reference:
+                at each key-frame, the predicted velocity rotated into the first body frame should match the preintegrated velocity.
               </p>
               <Equation tex={EQUATIONS.velocityResidual} number={8} />
-              <p>Without roll &amp; pitch aiding, we fix <KatexSpan tex={String.raw`\mathbf{b}_g = \mathbf{0}`} /> and solve for gravity and initial velocity by Gauss&ndash;Newton, from an initial guess provided by the network:</p>
+              <p>The <i>vel</i> variant fixes <KatexSpan tex={String.raw`\mathbf{b}_g = \mathbf{0}`} /> and solves for gravity and initial velocity by Gauss&ndash;Newton, starting from the network&apos;s guess:</p>
               <Equation tex={EQUATIONS.velocityObjective} number={9} />
             </article>
             <article className='min-w-0 rounded-2xl bg-white p-4 shadow-sm md:p-6'>
               <h3 className='pb-2 text-gray-800'>Roll &amp; pitch aiding (+rp)</h3>
-              <p>
-                A gyroscope bias makes the preintegrated rotation drift, so the gravity direction it propagates to each key-frame departs from the roll &amp; pitch predicted by the network, which does not drift.
-                This residual measures the departure and thereby constrains the bias:
-              </p>
+              <p>A gyroscope bias makes the preintegrated rotation drift away from the network&apos;s roll &amp; pitch, which do not drift. This residual measures the drift:</p>
               <Equation tex={EQUATIONS.rollPitchResidual} number={10} />
-              <p>If the two agree, <KatexSpan tex={String.raw`\mathbf{q}_k`} /> is parallel to the vertical axis, and its two horizontal components, which <KatexSpan tex={String.raw`\mathbf{S}`} /> selects, vanish. The +rp variant adds these residuals to the velocity objective and, with raw IMU, also estimates the bias:</p>
+              <p>It is zero when <KatexSpan tex={String.raw`\mathbf{q}_k`} /> is vertical. The <i>+rp</i> variant adds it to (9) and, with raw IMU, also estimates the bias:</p>
               <Equation tex={EQUATIONS.jointObjective} number={11} />
-              <p className='text-sm'>
-                With AirIMU correction, the learned corrections already compensate the gyroscope bias, so the residual bias stays fixed at zero.
-              </p>
+              <p className='text-base'>With AirIMU correction, the bias is already compensated and stays at zero.</p>
             </article>
           </div>
           <p className='figure-caption'>
-            <KatexSpan tex={String.raw`\boldsymbol{\gamma}`} /> and <KatexSpan tex={String.raw`\boldsymbol{\beta}`} /> are the rotation and velocity preintegration increments, <KatexSpan tex={String.raw`\hat{\mathbf{v}}`} /> and <KatexSpan tex={String.raw`\hat{\mathbf{R}}`} /> are network predictions, and <KatexSpan tex={String.raw`\boldsymbol{\Sigma}_k`} /> weights each residual by its propagated or predicted covariance.
+            <KatexSpan tex={String.raw`\boldsymbol{\gamma}, \boldsymbol{\beta}`} />: preintegrated rotation and velocity. <KatexSpan tex={String.raw`\hat{\mathbf{v}}, \hat{\mathbf{R}}`} />: network predictions. <KatexSpan tex={String.raw`\boldsymbol{\Sigma}_k`} />: covariance weights.
           </p>
-          <p className='mt-6 rounded-r-lg border-l-4 border-primary-500 bg-primary-50 px-4 py-3 text-sm leading-relaxed'>
-            <strong className='text-primary-700'>One network, two window lengths:</strong> a residual one-dimensional convolution with kernel size 16 and stride 8 embeds 1024 six-channel IMU samples into 127 tokens, one per key-frame, followed by 6 pre-norm attention blocks with 6 heads each and four two-layer MLP heads of width 128.
-            Because the convolutional stem and the sinusoidal encodings accept inputs of any length, the same weights process both the 1024-sample odometry windows and the shorter initialization windows.
+          <p className='mt-6 rounded-r-lg border-l-4 border-primary-500 bg-primary-50 px-4 py-3 text-base leading-relaxed'>
+            <strong className='text-primary-700'>One network, two window lengths:</strong> the convolutional stem (kernel 16, stride 8) gives one token per key-frame and accepts any input length,
+            so the same weights serve the 1024-sample odometry windows and the shorter initialization windows.
           </p>
         </div>
       </section>
 
+      <section id='demo' aria-labelledby='demo-title' className={clsx(bgColor, textColor)}>
+        <div className='layout py-12'>
+          <h2 id='demo-title' className='pb-4'>Interactive Demo</h2>
+          <p className='text-lg'>
+            A toy 3-D simulation of the initializer that runs in your browser. The IMU data and network predictions are synthetic; real results are in the <a href='#results' className='font-medium text-primary-700 underline decoration-primary-300 underline-offset-2 hover:decoration-primary-700'>Evaluation</a>.
+          </p>
+          <div className='pt-8'>
+            <AlignmentDemo />
+          </div>
+        </div>
+      </section>
+
       <section id='results' aria-labelledby='results-title' className={clsx(bgColor, textColor)}>
-        <div className='layout pt-12 pb-12'>
+        <div className='layout border-t border-gray-200 pt-12 pb-12'>
           <h2 id='results-title' className='pb-4'>Evaluation</h2>
-          <p className='max-w-[58rem] text-lg'>
-            We compare IMU-only initialization with visual-inertial initialization on EuRoC, and test whether odometry with IMU-only initialization retains the accuracy of the same EKF under oracle initialization on three datasets.
-            Oracle initialization supplies the ground-truth initial state; IMU-only initialization estimates it with I-Init and uses <span className={hlTextColor}>no ground-truth input at inference</span>.
+          <p className='text-lg'>
+            We compare IMU-only with visual-inertial initialization on EuRoC, and odometry under IMU-only versus oracle (ground-truth) initialization on three datasets.
+            IMU-only runs use <span className={hlTextColor}>no ground truth at inference</span>.
           </p>
           <ul className='grid gap-4 pt-6 md:grid-cols-3'>
             {datasets.map((dataset) => (
@@ -268,7 +289,7 @@ export default function HomePage() {
                 <img src={dataset.logo} alt='' className='h-12 w-12 shrink-0 object-contain' />
                 <div className='min-w-0'>
                   <h3 className='text-xl text-gray-800'>{dataset.name}</h3>
-                  <p className='text-sm'>{dataset.platform}. {dataset.split}</p>
+                  <p className='text-base'>{dataset.platform}. {dataset.split}</p>
                 </div>
               </li>
             ))}
@@ -281,19 +302,18 @@ export default function HomePage() {
           <FindingBlock
             idx={1}
             title='IMU-only initialization can be more reliable than visual-inertial initialization'
-            setup={<>We evaluate on 2.5 s segments from the EuRoC evaluation sequences. A segment succeeds when the gravity-direction error is below 5° and the velocity RMSE is below 0.5 m/s.</>}
+            setup={<>2.5 s EuRoC segments. Success: gravity-direction error below 5° and velocity RMSE below 0.5 m/s.</>}
             results={[
-              <>I-Init:+rp with AirIMU correction succeeds on <span className={hlTextColor}>95%</span> of segments, compared with <span className={hlTextColor}>51%</span> for VINS-Mono, with a lower average gravity-direction error (1.445° versus 1.611°).</>,
-              <>Above 40°/s, VINS-Mono succeeds on at most 12% of the segments in any cell and on none above 55°/s; in the same cells, I-Init succeeds on 62&ndash;100%.</>,
-              <>VINS-Mono also fails on most near-stationary segments (9% below 0.1 m/s), where I-Init succeeds on 90%.</>,
+              <>I-Init:+rp with AirIMU succeeds on <span className={hlTextColor}>95%</span> of segments versus <span className={hlTextColor}>51%</span> for VINS-Mono, with lower gravity error (1.445° vs. 1.611°).</>,
+              <>Above 40°/s, VINS-Mono succeeds on at most 12% of segments per cell; I-Init on 62&ndash;100%.</>,
             ]}
-            note={<>VINS-Mono attains a lower velocity RMSE (0.169 versus 0.267 m/s). I-Init is least reliable above 1.1 m/s, dropping to 57&ndash;75% in several cells and to 0% in the cell combining 1.3&ndash;2.7 m/s with 30&ndash;40°/s, in which VINS-Mono also fails.</>}
+            note={<>VINS-Mono has lower velocity RMSE (0.169 vs. 0.267 m/s). I-Init is least reliable above 1.1 m/s.</>}
             below={
               <ResultsTable
                 idx='I'
                 title='Initialization on EuRoC'
                 data={initializationTable}
-                caption={<>Velocity RMSE, gravity-direction error, and success rate (SR) at a nominal initialization duration of 2.5 s. Bold values indicate the best result in each column across all methods. <i>vel</i> solves (9) from learned velocity alone; <i>+rp</i> adds the roll &amp; pitch residual (10) and estimates gyroscope bias for raw IMU. <i>Network Init</i> returns the unrefined network estimate.</>}
+                caption={<>SR: success rate. Bold: best per column. <i>vel</i> solves (9); <i>+rp</i> adds (10) and, with raw IMU, estimates the bias. <i>Network Init</i> is the unrefined network estimate.</>}
               />
             }
           >
@@ -303,7 +323,7 @@ export default function HomePage() {
               title='Initialization success across motion regimes on EuRoC'
               width={1317}
               height={652}
-              caption={<>Matched 2.5 s segments from the five evaluation sequences are binned by speed and angular speed. Each cell reports the success rate of VINS-Mono (left) and I-Init (<i>vel</i> with AirIMU correction, right); blank cells contain no segments. Success requires a gravity-direction error below 5° and a velocity RMSE below 0.5 m/s.</>}
+              caption={<>VINS-Mono (left) and I-Init <i>vel</i> with AirIMU (right). Blank cells have no segments.</>}
               idx={3}
             />
           </FindingBlock>
@@ -311,13 +331,13 @@ export default function HomePage() {
           <FindingBlock
             idx={2}
             title='Gyroscope bias is the dominant error source of IMU-only alignment'
-            setup={<>An uncompensated bias corrupts the preintegrated rotation, which misaligns the predicted velocities and distorts the gravity estimate. Whether learned by AirIMU or estimated by +rp, bias compensation is essential.</>}
+            setup={<>An uncompensated bias corrupts the preintegrated rotation and distorts the gravity estimate.</>}
             results={[
-              <>With raw IMU, <i>vel</i> succeeds on only 13% of segments, fewer than the unrefined Network Init (25%).</>,
-              <>Estimating the bias through the roll &amp; pitch residuals halves the gravity-direction error, from 6.048° to 3.042°, and raises the success rate to <span className={hlTextColor}>86%</span>. The estimated bias magnitude deviates from the reference by 4.63%, compared with 7.18% for VINS-Mono.</>,
-              <>With AirIMU correction, <i>vel</i> and <i>+rp</i> both reach <span className={hlTextColor}>95%</span> success, so the roll &amp; pitch residuals add little once the bias is compensated.</>,
+              <>With raw IMU, <i>vel</i> succeeds on only 13% of segments, below Network Init (25%).</>,
+              <><i>+rp</i> estimates the bias, halving the gravity error (6.05° to 3.04°) and raising success to <span className={hlTextColor}>86%</span>. Its bias-magnitude error is 4.63%, versus 7.18% for VINS-Mono.</>,
+              <>With AirIMU, <i>vel</i> and <i>+rp</i> both reach <span className={hlTextColor}>95%</span>.</>,
             ]}
-            note={<>The window length trades motion information against accumulated bias. At T = 0.5 s, gravity-direction errors are approximately 4&ndash;5°; with AirIMU correction, the velocity error and success rate saturate around T = 2.5&ndash;3.0 s. We therefore use T = 2.5 s as a practical compromise between initialization delay and accuracy.</>}
+            note={<>We use T = 2.5 s: shorter windows carry little motion, and with AirIMU the velocity error and success rate level off around 2.5&ndash;3.0 s.</>}
           >
             <Figure
               img_src='/images/fig4_window_length.png'
@@ -325,7 +345,7 @@ export default function HomePage() {
               title='Roll &amp; pitch aiding and initialization window length on EuRoC'
               width={2356}
               height={765}
-              caption={<>Gravity-direction error (left), body-frame velocity error (middle), and success rate (right) for initialization windows ranging from 0.5 to 5.0 s. With raw IMU, <i>+rp</i> also jointly estimates gyroscope bias; with AirIMU correction, residual bias is fixed to zero. The curves for I-Init:<i>vel</i> and I-Init:<i>+rp</i> nearly overlap when AirIMU correction is used.</>}
+              caption={<>With raw IMU, <i>+rp</i> also estimates the gyroscope bias; with AirIMU, the bias is fixed at zero.</>}
               idx={4}
             />
           </FindingBlock>
@@ -333,13 +353,13 @@ export default function HomePage() {
           <FindingBlock
             idx={3}
             title='IMU-only initialization preserves odometry accuracy'
-            setup={<>The goal is not to outperform the oracle, but to match the same EKF under oracle initialization. IMU-only runs are aligned only in initial heading and position, with no trajectory fitting, scale correction, or roll &amp; pitch alignment.</>}
+            setup={<>The goal is to match the same EKF under oracle initialization. IMU-only runs are aligned only in initial heading and position.</>}
             results={[
-              <>Odometry with I-Init:+rp reaches an ATE of 2.91, 2.79, and 1.35 m on EuRoC, Blackbird, and TLIO, <span className={hlTextColor}>within 0.07 m</span> of oracle initialization on every dataset.</>,
-              <>Refinement reduces the ATE relative to Network Init on all three datasets, for example from 3.06 to 2.91 m on EuRoC.</>,
-              <>Without attitude input, the Motion Network remains competitive: among oracle-initialized EKF variants, ours attains the lowest ATE on EuRoC (2.97 m) and TLIO (1.35 m).</>,
+              <>With I-Init:+rp, ATE stays <span className={hlTextColor}>within 0.07 m</span> of oracle initialization on all three datasets.</>,
+              <>Refinement lowers ATE relative to Network Init everywhere, e.g. 3.06 to 2.91 m on EuRoC.</>,
+              <>Without attitude input, our EKF has the lowest oracle ATE on EuRoC and TLIO.</>,
             ]}
-            note={<>AirIO EKF remains more accurate on Blackbird (2.33 versus 2.76 m). Without an EKF, I-Init attains the lowest ATE on all three datasets, while AirIO attains a lower AVE on EuRoC (0.286 versus 0.360 m/s).</>}
+            note={<>AirIO EKF is more accurate on Blackbird (2.33 vs. 2.76 m).</>}
           >
             <TabGroup>
               <TabList aria-label='Odometry result tables' className='mb-3 flex flex-wrap gap-2'>
@@ -363,7 +383,7 @@ export default function HomePage() {
                     idx='II'
                     title='Inertial odometry accuracy: ATE (m) and AVE (m/s)'
                     data={odometryTable}
-                    caption={<>The initial state is supplied by ground truth (Oracle) or estimated by IMU-only initialization. Both protocols use the same scoring intervals. Bold values indicate the lowest error in each column across all methods, including ties. † Uses oracle initialization. Our EKF runs use AirIMU-corrected propagation. With IMU-only initialization, the <i>vel</i> and <i>+rp</i> variants also use AirIMU-corrected preintegration, with residual gyroscope bias fixed to zero.</>}
+                    caption={<>Bold: lowest per column, including ties. † Oracle initialization. Our EKF uses AirIMU-corrected propagation; <i>vel</i> and <i>+rp</i> also use AirIMU-corrected preintegration with the bias fixed at zero.</>}
                   />
                 </TabPanel>
                 <TabPanel>
@@ -371,7 +391,7 @@ export default function HomePage() {
                     idx='IV'
                     title='Network-only inertial odometry accuracy: ATE (m) and AVE (m/s)'
                     data={networkOnlyTable}
-                    caption={<>All methods use oracle initialization and integrate their network predictions without an EKF. Bold values indicate the lowest error in each column, including ties. I-Init reduces the ATE of AirIO, whose network additionally receives an attitude estimate, by 15%, 7%, and 37% on EuRoC, Blackbird, and TLIO, respectively.</>}
+                    caption={<>Oracle initialization, no EKF. Bold: lowest per column, including ties. I-Init lowers AirIO&apos;s ATE by 15%, 7%, and 37%, although AirIO&apos;s network also receives attitude.</>}
                   />
                 </TabPanel>
               </TabPanels>
@@ -381,40 +401,25 @@ export default function HomePage() {
           <FindingBlock
             idx={4}
             title='Learned uncertainty is essential for fusing learned velocity with IMU propagation'
-            setup={<>We independently set the measurement-noise covariance R of the Motion Network and the propagation-noise covariance Q of AirIMU to identity matrices or to their learned values. All other components remain fixed, so the comparison isolates the effect of uncertainty weighting.</>}
+            setup={<>The Motion Network&apos;s R and AirIMU&apos;s Q are each set to identity or to their learned values; nothing else changes.</>}
             results={[
-              <>Using learned values for both covariances yields the lowest ATE and AVE on all three datasets.</>,
-              <>Learning only one does not consistently help: learned Q with identity R increases both errors on every dataset, reaching an ATE of <span className={hlTextColor}>59.6 m</span> on Blackbird.</>,
+              <>Learning both gives the lowest ATE and AVE on every dataset.</>,
+              <>Learned Q with identity R raises both errors everywhere, up to <span className={hlTextColor}>59.6 m</span> ATE on Blackbird.</>,
             ]}
-            note={<>The filter balances velocity measurements against IMU propagation through the relative scale of R and Q, so the two covariances are effective only when both are learned.</>}
+            note={<>The filter weighs velocity against propagation by the ratio of R to Q, so both must be learned.</>}
           >
             <ResultsTable
               idx='III'
               title='Learned measurement and propagation covariances in the EKF'
               data={covarianceTable}
-              caption={<>A check marks a learned covariance and a cross an identity covariance. All variants use oracle initialization, AirIMU-corrected IMU measurements, network velocity predictions, and scoring; only the choices of R and Q change. Bold values indicate the lowest error in each column.</>}
+              caption={<>Check: learned. Cross: identity. Oracle initialization. Bold: lowest per column.</>}
             />
           </FindingBlock>
         </div>
       </section>
 
-      <section id='limitations' aria-labelledby='limitations-title' className={clsx(secondaryBgColor, textColor)}>
-        <div className='layout py-12'>
-          <h2 id='limitations-title' className='pb-4'>Limitations</h2>
-          <ul className='list-disc space-y-2 pl-6 text-lg'>
-            <li>As in visual-inertial odometry, global yaw and position remain unobservable.</li>
-            <li>Over a short window, the accelerometer bias is coupled with gravity and is therefore not estimated.</li>
-            <li>Estimating all three gyroscope-bias components requires rotation within the window.</li>
-            <li>The learned motion may degrade outside the training distribution.</li>
-          </ul>
-          <p className='pt-4 text-lg'>
-            Future work will investigate cross-platform generalization of the Motion Network and the stability of EKF fusion with learned velocity measurements.
-          </p>
-        </div>
-      </section>
-
       <section id='citation' className={clsx(bgColor, textColor)}>
-        <div className='layout pt-4 pb-48'>
+        <div className='layout border-t border-gray-200 pt-4 pb-48'>
           <div className='mt-12 mb-4 flex items-center justify-between gap-3'>
             <h2>Citation</h2>
             <button
@@ -437,7 +442,7 @@ export default function HomePage() {
           <p role='status' className={copyStatus === 'error' ? 'mb-2 text-sm text-red-700' : 'sr-only'}>
             {copyStatus === 'copied' ? 'Citation copied to clipboard.' : copyStatus === 'error' ? 'Unable to copy. Please select and copy the citation below.' : ''}
           </p>
-          <pre className='whitespace-pre-wrap text-sm leading-relaxed'>{citation_bibtex}</pre>
+          <pre className='whitespace-pre-wrap text-sm leading-relaxed md:text-base'>{citation_bibtex}</pre>
         </div>
       </section>
     </main>

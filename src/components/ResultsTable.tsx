@@ -24,7 +24,7 @@ export default function ResultsTable({ idx, title, caption, data }: ResultsTable
         tabIndex={0}
         className='overflow-x-auto rounded-md border border-gray-200 bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600'
       >
-        <table className='w-full min-w-max border-collapse text-sm tabular-nums'>
+        <table className='w-full min-w-max border-collapse text-sm tabular-nums md:text-[0.9375rem]'>
           <thead className='text-gray-800'>
             <tr>
               {leadGroup ? (
@@ -51,7 +51,7 @@ export default function ResultsTable({ idx, title, caption, data }: ResultsTable
                 <th key={l} scope='col' className='px-3 pb-2 text-center font-medium text-gray-600'>{label}</th>
               ))}
               {subColumns.filter(({ label }) => label !== null).map(({ label, startsGroup, key }) => (
-                <th key={key} scope='col' className={clsx('whitespace-nowrap px-3 pb-2 text-right text-xs font-medium text-gray-600', startsGroup && groupRule)}>{label}</th>
+                <th key={key} scope='col' className={clsx('whitespace-nowrap px-3 pb-2 text-right text-xs font-medium text-gray-600 md:text-sm', startsGroup && groupRule)}>{label}</th>
               ))}
             </tr>
           </thead>
@@ -59,7 +59,7 @@ export default function ResultsTable({ idx, title, caption, data }: ResultsTable
             <tbody key={g} className='border-t border-gray-300'>
               {group.title && (
                 <tr>
-                  <th colSpan={lead.length + subColumns.length} scope='colgroup' className='px-3 pb-1 pt-3 text-left text-sm font-normal italic text-gray-500'>
+                  <th colSpan={lead.length + subColumns.length} scope='colgroup' className='px-3 pb-1 pt-3 text-left text-sm font-normal italic text-gray-500 md:text-base'>
                     <span className='sticky left-3 inline-block max-w-[calc(100vw-5rem)]'>{group.title}</span>
                   </th>
                 </tr>

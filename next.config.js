@@ -1,3 +1,5 @@
+const { PHASE_PRODUCTION_BUILD } = require('next/constants');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
@@ -7,7 +9,6 @@ const nextConfig = {
   output: 'export',
   reactStrictMode: true,
   swcMinify: true,
-  distDir: 'docs',
 
   images: {
     unoptimized: true,
@@ -49,4 +50,9 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// Only `next build` writes the static export into docs/, which GitHub Pages serves.
+// `next dev` and every other command use .next/, so they can never overwrite the published site.
+module.exports = (phase) => ({
+  ...nextConfig,
+  distDir: phase === PHASE_PRODUCTION_BUILD ? 'docs' : '.next',
+});
