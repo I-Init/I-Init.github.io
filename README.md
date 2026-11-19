@@ -1,7 +1,7 @@
 # I-Init project page
 
 Project page for **I-Init: IMU-Only Initialization for Learning Inertial Odometry**,
-to be served at <https://i-init.github.io>.
+served at <https://i-init.github.io>.
 Built on the same Next.js + Tailwind template as the
 [SSIO](https://github.com/SSIO-IMU/SSIO-IMU.github.io) project page.
 
@@ -21,20 +21,21 @@ does not work because asset paths are absolute.
 
 ## Publishing
 
-The repository starts private. GitHub Pages cannot serve a private repository on
-GitHub Free, so the site goes live in two steps:
+GitHub Pages serves the repository's `main` branch, folder `/docs` (Settings → Pages).
+Because the repository is named `I-Init.github.io` under the `I-Init` organization, the
+site is served at the root of <https://i-init.github.io>. To update it, run
+`corepack pnpm build` and commit and push `docs/` together with the source.
 
-1. Settings → General → Danger Zone → Change repository visibility → Public.
-2. Settings → Pages → Deploy from a branch → `main`, folder `/docs`.
+The build also writes `robots.txt` and the sitemap into `docs/`; they are committed with
+the rest of `docs/` (their copies in `public/` are ignored).
 
-Because the repository is named `I-Init.github.io` under the `I-Init` organization,
-the site is then served at the root of <https://i-init.github.io>. Making the
-repository public also publishes `public/I-Init.pdf`.
+The paper PDF is not in the repository, and `.gitignore` keeps PDFs out of `public/` and
+`docs/`, until the paper is public. Then add a Paper button that links to arXiv (see
+"Still to do").
 
 ## Content sources
 
-Everything on the page comes from the paper, `public/I-Init.pdf`, except the
-interactive demo. The abstract is verbatim; the rest of the text, including figure and
+Everything on the page comes from the paper, except the interactive demo. The abstract is verbatim; the rest of the text, including figure and
 table captions, is condensed from the paper and leaves out what the figures already show.
 
 - **Interactive demo** in `src/components/demos/AlignmentDemo.tsx` runs a toy
@@ -90,9 +91,11 @@ table captions, is condensed from the paper and leaves out what the figures alre
   ffmpeg -ss 13.6 -i hero-trajectories.mp4 -frames:v 1 -q:v 3 hero-trajectories-poster.jpg
   ```
 
-## Before going public
+## Still to do
 
-- Add arXiv, GitHub, and Hugging Face buttons next to the Paper button in
-  `src/app/page.tsx`; their icons are already in `public/svg/`.
+- Once the paper is public, add a Paper button (linking to arXiv) next to BibTeX in the
+  hero of `src/app/page.tsx`, plus GitHub and Hugging Face buttons once they exist; their
+  icons are already in `public/svg/`.
 - Update the BibTeX entry in `src/app/page.tsx` once the paper has an arXiv ID or venue.
 - Only Sebastian Scherer and Yuheng Qiu have homepage links so far.
+- `public/videos/hero-trajectories.*` (the earlier dark hero clip) is not used on the page.

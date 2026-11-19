@@ -35,8 +35,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# next-sitemap
-robots.txt
-sitemap.xml
-sitemap-*.xml
+# next-sitemap: the copies it writes to public/ are build output; the ones in docs/ are published.
+/public/robots.txt
+/public/sitemap.xml
+/public/sitemap-*.xml
+
+# The paper PDF stays out of the repository until the paper is public.
+/public/*.pdf
+/docs/*.pdf
 

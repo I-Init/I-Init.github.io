@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://i-init.github.io
+
+# Sitemaps
+Sitemap: https://i-init.github.io/sitemap.xml

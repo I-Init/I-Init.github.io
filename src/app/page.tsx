@@ -2,7 +2,7 @@
 
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
-import { Check, Copy, FileText, Quote } from 'lucide-react';
+import { Check, Copy, Quote } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import '@/lib/env';
@@ -126,12 +126,9 @@ export default function HomePage() {
             <span><sup>2</sup>Penn State University</span>
             <span><sup>3</sup>Amazon FAR</span>
           </div>
-          {/* Add arXiv, GitHub, and Hugging Face buttons here once they exist; their icons are in public/svg/. */}
+          {/* Add Paper (arXiv), GitHub, and Hugging Face buttons here once they are public, styled like the dark
+              primary button 'bg-gray-900 text-white hover:bg-primary-700'; their icons are in public/svg/. */}
           <div className='mt-7 flex flex-wrap justify-center gap-3 [@media(max-height:760px)]:mt-4'>
-            <UnstyledLink href='/I-Init.pdf' openNewTab className={clsx(heroButtonClass, 'bg-gray-900 text-white hover:bg-primary-700')}>
-              <FileText aria-hidden='true' />
-              Paper
-            </UnstyledLink>
             <UnstyledLink href='#citation' className={clsx(heroButtonClass, 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-100')}>
               <Quote aria-hidden='true' />
               BibTeX
