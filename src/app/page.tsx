@@ -11,19 +11,11 @@ import { covarianceTable, initializationTable, networkOnlyTable, odometryTable }
 
 import AlignmentDemo from '@/components/demos/AlignmentDemo';
 import Figure from '@/components/Figure';
+import HeroVideo from '@/components/HeroVideo';
 import KatexSpan from '@/components/KaTeX';
-import ArrowLink from '@/components/links/ArrowLink';
 import UnderlineLink from '@/components/links/UnderlineLink';
+import UnstyledLink from '@/components/links/UnstyledLink';
 import ResultsTable from '@/components/ResultsTable';
-
-const HERO_FRAMES = [
-  '/images/hero/euroc-v103-1.jpg',
-  '/images/hero/euroc-v103-2.jpg',
-  '/images/hero/euroc-v103-3.jpg',
-  '/images/hero/euroc-v103-4.jpg',
-];
-// Matches the 10 s loop of .hero-frame in globals.css.
-const HERO_FRAME_SECONDS = 2.5;
 
 const EQUATIONS = {
   states: String.raw`\mathcal{X}^{\mathrm{init}} = \{\mathbf{g}^{b_0},\ \mathbf{v}_{b_0}^{b_0},\ \mathbf{b}_g\}`,
@@ -99,12 +91,10 @@ export default function HomePage() {
 
   const textColor = 'text-gray-600';
   const bgColor = 'bg-white';
-  const maskColor = 'bg-white/75';
   const secondaryBgColor = 'bg-gray-100';
   const hlTextColor = 'text-primary-600';
-  const linkIconClass = 'h-5 w-5 shrink-0 md:h-6 md:w-6';
-  const resourceLinkClass =
-    'h-14 justify-center gap-2 rounded-lg border border-solid border-gray-300 bg-white/60 px-3 text-sm [&>svg:last-child]:hidden md:mt-6 md:h-auto md:gap-1 md:rounded-none md:border-x-0 md:border-t-0 md:border-dotted md:border-dark md:bg-transparent md:px-0 md:text-lg md:[&>svg:last-child]:block';
+  const heroButtonClass =
+    'inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-base font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 md:px-6 md:text-lg [&>svg]:h-[1.1em] [&>svg]:w-[1.1em] [&>svg]:shrink-0';
   const citation_bibtex = `@misc{huang2026iinit,
       title={I-Init: IMU-Only Initialization for Learning Inertial Odometry},
       author={Weison Huang and Xiang Fei and Junyi Geng and Wenshan Wang and Sebastian Scherer and Yuheng Qiu},
@@ -112,51 +102,68 @@ export default function HomePage() {
 }`;
   return (
     <main>
-      <section className={clsx('bg-black', textColor, 'relative flex min-h-screen flex-col items-center justify-center overflow-hidden')}>
-        <div aria-hidden='true' className='pointer-events-none absolute inset-0 z-0'>
-          {HERO_FRAMES.map((src, i) => (
-            <img
-              key={src}
-              src={src}
-              alt=''
-              className='hero-frame'
-              style={{ animationDelay: `${(i - HERO_FRAMES.length) * HERO_FRAME_SECONDS}s` }}
-            />
-          ))}
-        </div>
-        <div className={clsx('pointer-events-none absolute inset-0 z-10', maskColor)} />
-        <div className='layout z-20 relative flex flex-1 flex-col items-center justify-center px-4 py-12 text-center'>
-          <h1 className='mb-6 mt-4 text-[clamp(1.75rem,8vw,3rem)] leading-[1.15] tracking-tight md:mb-4 md:text-5xl md:leading-[1.1]'>
+      {/* One screen tall. The text keeps its natural height (tighter on screens 760px tall or less) and the teaser
+          card takes the rest, at the same width as the sections below. Once the card reaches the shape of its clips,
+          the text and card are centered together. */}
+      <section className='relative flex min-h-svh flex-col justify-center overflow-hidden bg-white text-gray-600'>
+        <div className='layout flex flex-col items-center pb-6 pt-10 text-center md:pb-8 md:pt-14 [@media(max-height:760px)]:pb-5 [@media(max-height:760px)]:pt-6'>
+          <h1 className='text-[clamp(1.875rem,7.5vw,3rem)] leading-[1.12] tracking-tight text-gray-900 md:text-5xl md:leading-[1.1] md:[@media(max-height:760px)]:text-[2.5rem]'>
             <span className='md:whitespace-nowrap'>
               I-Init: <span className={hlTextColor}>I</span>MU-Only <span className={hlTextColor}>Init</span>ialization
             </span>{' '}
             <span className='md:block md:whitespace-nowrap'>for Learning Inertial Odometry</span>
           </h1>
-          <div className='container pb-6'>
-            <div className='text-[15px] leading-7 md:text-lg md:leading-[1.75] [&>span]:inline-block [&>span]:whitespace-nowrap [&_sup]:ml-0.5 [&_sup]:text-[0.65em]'>
-              <span>Weison Huang<sup>1</sup>,</span>{' '}
-              <span>Xiang Fei<sup>1</sup>,</span>{' '}
-              <span>Junyi Geng<sup>2</sup>,</span>{' '}
-              <span>Wenshan Wang<sup>1</sup>,</span>{' '}
-              <span><UnderlineLink href='https://theairlab.org/team/sebastian/' className='font-normal'>Sebastian Scherer</UnderlineLink><sup>1</sup>,</span>{' '}
-              <span><UnderlineLink href='https://haleqiu.github.io/' className='font-normal'>Yuheng Qiu</UnderlineLink><sup>1,3</sup></span>
-            </div>
+          <div className='mt-5 max-w-4xl text-[15px] leading-7 [@media(max-height:760px)]:mt-3 text-gray-700 md:text-lg md:leading-8 [&>span]:inline-block [&>span]:whitespace-nowrap [&_sup]:ml-0.5 [&_sup]:text-[0.65em] [&_sup]:text-gray-500'>
+            <span>Weison Huang<sup>1</sup>,</span>{' '}
+            <span>Xiang Fei<sup>1</sup>,</span>{' '}
+            <span>Junyi Geng<sup>2</sup>,</span>{' '}
+            <span>Wenshan Wang<sup>1</sup>,</span>{' '}
+            <span><UnderlineLink href='https://theairlab.org/team/sebastian/' className='font-normal'>Sebastian Scherer</UnderlineLink><sup>1</sup>,</span>{' '}
+            <span><UnderlineLink href='https://haleqiu.github.io/' className='font-normal'>Yuheng Qiu</UnderlineLink><sup>1,3</sup></span>
+          </div>
+          <div className='mt-1.5 flex flex-wrap justify-center gap-x-5 gap-y-0.5 text-sm text-gray-500 md:text-base [&>span]:whitespace-nowrap [&_sup]:mr-0.5 [&_sup]:text-[0.7em]'>
+            <span><sup>1</sup>Carnegie Mellon University</span>
+            <span><sup>2</sup>Penn State University</span>
+            <span><sup>3</sup>Amazon FAR</span>
           </div>
           {/* Add arXiv, GitHub, and Hugging Face buttons here once they exist; their icons are in public/svg/. */}
-          <div className='grid w-full max-w-sm grid-cols-2 gap-3 md:flex md:max-w-none md:justify-center md:gap-8'>
-            <ArrowLink className={resourceLinkClass} href='/I-Init.pdf' openNewTab icon={<FileText aria-hidden='true' className={linkIconClass} />}>
+          <div className='mt-7 flex flex-wrap justify-center gap-3 [@media(max-height:760px)]:mt-4'>
+            <UnstyledLink href='/I-Init.pdf' openNewTab className={clsx(heroButtonClass, 'bg-gray-900 text-white hover:bg-primary-700')}>
+              <FileText aria-hidden='true' />
               Paper
-            </ArrowLink>
-            <ArrowLink className={resourceLinkClass} href='#citation' icon={<Quote aria-hidden='true' className={linkIconClass} />}>
+            </UnstyledLink>
+            <UnstyledLink href='#citation' className={clsx(heroButtonClass, 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-100')}>
+              <Quote aria-hidden='true' />
               BibTeX
-            </ArrowLink>
+            </UnstyledLink>
           </div>
         </div>
-        <div className='relative z-20 flex w-full flex-wrap items-end justify-start gap-x-5 gap-y-2 px-3 pb-3 text-left text-base leading-relaxed text-gray-700 md:text-lg [&>span]:whitespace-nowrap [&_sup]:mr-1 [&_sup]:text-[0.7em]'>
-          <span><sup>1</sup>Carnegie Mellon University</span>
-          <span><sup>2</sup>Penn State University</span>
-          <span><sup>3</sup>Amazon FAR</span>
-          <span className='ml-auto hidden text-sm text-gray-600 lg:inline'>Background: EuRoC V1_03, t = 0 to 2.5 s, mean angular velocity 60.3 °/s</span>
+        {/* Grows into the height left under the text, up to the card's widest shape (width / 2.1) plus the caption.
+            Phones show the chart only, so there the cap is the chart's own shape (1.7) plus its title and the caption. */}
+        <div className='relative flex max-h-[calc((91.6667vw-1.5rem)/1.7+10rem)] flex-1 flex-col md:max-h-[calc(min(87.5rem,91.6667vw)/2.1+5.5rem)]'>
+          {/* A light band from about the middle of the card to the bottom of the screen; the section clips it. The
+              text area above stays plain white. */}
+          <div aria-hidden='true' className='absolute inset-x-0 -bottom-[100vh] top-[45%] border-t border-gray-100 bg-gray-50' />
+          {/* The camera panel crops to fit; the chart is letterboxed so it always shows whole. */}
+          <figure className='layout relative flex flex-1 flex-col pb-6 md:pb-8'>
+            <div className='flex min-h-[13rem] flex-1 overflow-hidden rounded-2xl bg-white shadow-xl shadow-gray-900/10 ring-1 ring-gray-900/10'>
+              <div className='relative hidden w-[30%] shrink-0 md:block'>
+                <HeroVideo src='/videos/hero-euroc-cameras.mp4' poster='/videos/hero-euroc-cameras-poster.jpg' />
+                <span className='absolute left-3 top-3 rounded-full bg-gray-900/60 px-2.5 py-1 text-xs font-medium text-white'>EuRoC footage</span>
+              </div>
+              {/* #fdfdfd is the white the chart clip renders as, so its frame does not show against the panel. */}
+              <div className='flex min-w-0 flex-1 flex-col bg-[#fdfdfd] px-3 pb-2 pt-3 md:px-6 md:pt-4'>
+                <p className='text-center text-sm font-semibold text-gray-800 md:text-base'>Initialization success rate vs angular speed</p>
+                <div className='relative min-h-0 flex-1'>
+                  <HeroVideo src='/videos/hero-success-rate.mp4' poster='/videos/hero-success-rate-poster.jpg' fit='contain' />
+                </div>
+              </div>
+            </div>
+            <figcaption className='mx-auto mt-3 max-w-4xl text-center text-sm leading-relaxed text-gray-500 md:text-base'>
+              On EuRoC, <span className='whitespace-nowrap'>VINS-Mono&apos;s</span> initialization success rate falls to zero under fast
+              rotation, while <span className='whitespace-nowrap'>I-Init&apos;s</span> stays high.
+            </figcaption>
+          </figure>
         </div>
       </section>
 

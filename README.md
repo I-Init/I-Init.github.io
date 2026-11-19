@@ -57,9 +57,38 @@ table captions, is condensed from the paper and leaves out what the figures alre
   under the “Network only” tab of Finding 3.
 - **Equations** in `src/app/page.tsx` keep the paper's numbering. KaTeX renders them
   during the static export, so a malformed formula fails the build.
-- **Hero backdrop** in `public/images/hero/` is the four EuRoC V1_03 frames embedded in
-  Figure 1, crossfading in a 10 s loop (`.hero-frame` in `src/styles/globals.css`).
-  Reduced-motion preferences show the first frame only.
+- **Hero teaser** is a card under the title, never behind text, built from the explainer's
+  "Under fast rotation" scene (0:31 to 0:54) as two clips so the card can take any shape:
+  - `hero-euroc-cameras.mp4`: the two EuRoC camera views, a seamless 6.9 s loop
+    (0:31.30 to 0:38.20). The card crops it to fit.
+  - `hero-success-rate.mp4`: the success-rate chart (I-Init vs VINS-Mono by angular speed)
+    drawing in, then holding for 2.6 s. The 16.6 s loop fades from and to white. The card
+    letterboxes it so it always shows whole.
+
+  The hero is one screen tall. The card spans the same width as the sections below and takes
+  the height left under the text, up to the clips' shape; phones show the chart only. Both
+  clips play muted through `src/components/HeroVideo.tsx`. Visitors who prefer reduced
+  motion get the posters and never download the clips. Keep `format=yuv420p` last: the white
+  fades otherwise switch the output to 4:4:4, which Safari and most phones cannot play. To
+  recut them from `public/videos/`:
+  ```bash
+  ffmpeg -ss 31.3 -t 6.9 -i i-init-explainer.mp4 -an -vf "fps=30,crop=852:1092:105:278,scale=600:-2:flags=lanczos,format=yuv420p" -c:v libx264 -preset slow -crf 30 -movflags +faststart hero-euroc-cameras.mp4
+  ffmpeg -i hero-euroc-cameras.mp4 -frames:v 1 -q:v 3 hero-euroc-cameras-poster.jpg
+  ffmpeg -ss 40.5 -t 14 -i i-init-explainer.mp4 -an -vf "setpts=PTS-STARTPTS,fps=30,crop=1546:906:965:405,scale=1280:-2:flags=lanczos,tpad=stop_mode=clone:stop_duration=2.6,fade=t=in:st=0:d=0.5:color=white,fade=t=out:st=16.0:d=0.6:color=white,format=yuv420p" -c:v libx264 -preset slow -crf 28 -movflags +faststart hero-success-rate.mp4
+  ffmpeg -ss 15 -i hero-success-rate.mp4 -frames:v 1 -q:v 3 hero-success-rate-poster.jpg
+  ```
+- **Earlier hero backdrop** (`hero-trajectories.mp4`, not used at the moment) is the explainer's
+  "Full pipeline, IMU only" scene (1:41 to 2:00): I-Init initialized odometry drawing over
+  ground truth on EuRoC, Blackbird and TLIO. It is played 1.5× faster, with the title, legend
+  and labels cropped out and the brightness inverted (hue kept), as a 14.6 s loop for a dark
+  hero. To recut it from `public/videos/` (the explainer's last frame, from 2:00.8, is black,
+  so the input stops at 2:00.7):
+  ```bash
+  LUT="lutyuv=y=minval+(maxval-minval)*exp(0.7*log((maxval-clipval)/(maxval-minval)+1e-9))"
+  VF="setpts=(PTS-STARTPTS)/1.5,fps=30,drawbox=x=1430:y=130:w=1130:h=95:color=white:t=fill,crop=2560:775:0:170,pad=2880:1620:160:422:color=white,scale=1920:1080:flags=lanczos,tpad=stop_mode=clone:stop_duration=1.5,format=yuv420p,$LUT,fade=t=in:st=0:d=0.5,fade=t=out:st=14.0:d=0.6"
+  ffmpeg -ss 101 -t 19.7 -i i-init-explainer.mp4 -an -vf "$VF" -c:v libx264 -preset slow -crf 26 -movflags +faststart hero-trajectories.mp4
+  ffmpeg -ss 13.6 -i hero-trajectories.mp4 -frames:v 1 -q:v 3 hero-trajectories-poster.jpg
+  ```
 
 ## Before going public
 
